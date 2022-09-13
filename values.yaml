@@ -1,0 +1,44 @@
+# Common values.
+
+zookeeper:
+  persistence:
+    size: 1Gi
+    accessMode: ReadWriteOnce
+    storageClass: rawfile-btrfs
+    # accessMode: ReadWriteMany
+    #selector:
+
+  replicaCount: 1
+  # env:
+  #   ZK_HEAP_SIZE: 200m
+  # resources:
+  #   requests:
+  #     memory: 200m
+
+hdfs-journalnode-k8s:
+  replicaCount: 1
+  persistence:
+    accessMode: ReadWriteOnce
+    size: 200Mi
+    storageClass: rawfile-btrfs
+
+hdfs-krb5-k8s:
+  replicaCount: 1
+  persistence:
+    accessMode: ReadWriteOnce
+    size: 200Mi
+    storageClass: rawfile-btrfs
+
+hdfs-namenode-k8s:
+  hostNetworkEnabled: false
+  persistence:
+    size: 1Gi
+
+global:
+  hostNetworkEnabled: false
+  zookeeperQuorumSize: 1
+  # Disables affinity so multiple member pods can launch on a single minikube
+  # node.
+  #  defaultAffinityEnabled: false
+  dataNodeHostPath:
+    - /mnt/sda1/hdfs-data
