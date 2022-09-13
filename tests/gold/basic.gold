@@ -410,19 +410,19 @@ data:
       </property>
       <property>
         <name>dfs.namenode.rpc-address.hdfs-k8s.nn0</name>
-        <value>my-hdfs-namenode-0.my-hdfs-namenode.default.svc.cluster.local:8020</value>
+        <value>my-hdfs-namenode-0.my-hdfs-namenode.default.svc.cluster.local:8022</value>
       </property>
       <property>
         <name>dfs.namenode.rpc-address.hdfs-k8s.nn1</name>
-        <value>my-hdfs-namenode-1.my-hdfs-namenode.default.svc.cluster.local:8020</value>
+        <value>my-hdfs-namenode-1.my-hdfs-namenode.default.svc.cluster.local:8022</value>
       </property>
       <property>
         <name>dfs.namenode.http-address.hdfs-k8s.nn0</name>
-        <value>my-hdfs-namenode-0.my-hdfs-namenode.default.svc.cluster.local:50070</value>
+        <value>my-hdfs-namenode-0.my-hdfs-namenode.default.svc.cluster.local:50077</value>
       </property>
       <property>
         <name>dfs.namenode.http-address.hdfs-k8s.nn1</name>
-        <value>my-hdfs-namenode-1.my-hdfs-namenode.default.svc.cluster.local:50070</value>
+        <value>my-hdfs-namenode-1.my-hdfs-namenode.default.svc.cluster.local:50077</value>
       </property>
       <property>
         <name>dfs.namenode.shared.edits.dir</name>
@@ -608,9 +608,9 @@ metadata:
     service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
 spec:
   ports:
-  - port: 8020
+  - port: 8022
     name: fs
-  - port: 50070
+  - port: 50077
     name: http
   clusterIP: None
   selector:
@@ -632,15 +632,15 @@ spec:
   ports:
     - name: client
       port: 2181
-      targetPort: 
+      targetPort:
       protocol: TCP
     - name: election
       port: 3888
-      targetPort: 
+      targetPort:
       protocol: TCP
     - name: server
       port: 2888
-      targetPort: 
+      targetPort:
       protocol: TCP
   selector:
     app: zookeeper
@@ -664,7 +664,7 @@ spec:
       port: 2181
       protocol: TCP
       targetPort: client
-      
+
   selector:
     app: zookeeper
     release: my-hdfs
@@ -672,7 +672,7 @@ spec:
 # Source: hdfs/charts/hdfs-datanode-k8s/templates/datanode-daemonset.yaml
 # Deleting a daemonset may need some trick. See
 # https://github.com/kubernetes/kubernetes/issues/33245#issuecomment-261250489
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: my-hdfs-datanode
@@ -681,6 +681,10 @@ metadata:
     chart: hdfs-datanode-k8s-0.1.0
     release: my-hdfs
 spec:
+  selector:
+    matchLabels:
+        app: hdfs-datanode
+        release: my-hdfs
   template:
     metadata:
       labels:
@@ -741,7 +745,6 @@ spec:
 ---
 # Source: hdfs/charts/hdfs-client-k8s/templates/client-deployment.yaml
 apiVersion: apps/v1
-apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: my-hdfs-client
@@ -783,7 +786,7 @@ spec:
             name: my-hdfs-config
 ---
 # Source: hdfs/charts/hdfs-journalnode-k8s/templates/journalnode-statefulset.yaml
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: my-hdfs-journalnode
@@ -794,6 +797,10 @@ metadata:
 spec:
   serviceName: my-hdfs-journalnode
   replicas: 3
+  selector:
+    matchLabels:
+      app: hdfs-journalnode
+      release: my-hdfs
   template:
     metadata:
       labels:
@@ -842,7 +849,7 @@ spec:
             storage: "20Gi"
 ---
 # Source: hdfs/charts/hdfs-namenode-k8s/templates/namenode-statefulset.yaml
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: my-hdfs-namenode
@@ -853,6 +860,10 @@ metadata:
 spec:
   serviceName: my-hdfs-namenode
   replicas: 2
+  selector:
+    matchLabels:
+      app: hdfs-journalnode
+      release: my-hdfs
   template:
     metadata:
       labels:
@@ -883,9 +894,9 @@ spec:
           args:
             - /entrypoint.sh "/nn-scripts/format-and-run.sh"
           ports:
-          - containerPort: 8020
+          - containerPort: 8022
             name: fs
-          - containerPort: 50070
+          - containerPort: 50077
             name: http
           volumeMounts:
             - name: nn-scripts
@@ -920,7 +931,7 @@ spec:
             storage: "100Gi"
 ---
 # Source: hdfs/charts/zookeeper/templates/statefulset.yaml
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: my-hdfs-zookeeper
@@ -939,9 +950,14 @@ spec:
       app: zookeeper
       release: my-hdfs
       component: server
+  selector:
+    matchLabels:
+      app: zookeeper
+      release: my-hdfs
+      component: server
   updateStrategy:
     type: OnDelete
-    
+
   template:
     metadata:
       labels:
@@ -953,7 +969,7 @@ spec:
       securityContext:
         fsGroup: 1000
         runAsUser: 1000
-        
+
       containers:
 
         - name: zookeeper
@@ -967,27 +983,27 @@ spec:
             - name: client
               containerPort: 2181
               protocol: TCP
-              
+
             - name: election
               containerPort: 3888
               protocol: TCP
-              
+
             - name: server
               containerPort: 2888
               protocol: TCP
-              
+
           livenessProbe:
             exec:
               command:
               - zkOk.sh
             initialDelaySeconds: 20
-            
+
           readinessProbe:
             exec:
               command:
               - zkOk.sh
             initialDelaySeconds: 20
-            
+
           env:
             - name: ZK_REPLICAS
               value: "1"
@@ -1028,7 +1044,7 @@ spec:
           resources:
             requests:
               memory: 100m
-            
+
           volumeMounts:
             - name: data
               mountPath: /var/lib/zookeeper
@@ -1044,7 +1060,7 @@ spec:
             storage: "5Gi"
 ---
 # Source: hdfs/charts/hdfs-journalnode-k8s/templates/journalnode-statefulset.yaml
-apiVersion: policy/v1beta1
+apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   name: my-hdfs-journalnode
@@ -1060,7 +1076,7 @@ spec:
   minAvailable: 2
 ---
 # Source: hdfs/charts/hdfs-namenode-k8s/templates/namenode-statefulset.yaml
-apiVersion: policy/v1beta1
+apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   name: my-hdfs-namenode
@@ -1076,7 +1092,7 @@ spec:
   minAvailable: 1
 ---
 # Source: hdfs/charts/zookeeper/templates/poddisruptionbudget.yaml
-apiVersion: policy/v1beta1
+apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   name: my-hdfs-zookeeper

@@ -213,9 +213,9 @@ metadata:
     service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
 spec:
   ports:
-  - port: 8020
+  - port: 8022
     name: fs
-  - port: 50070
+  - port: 50077
     name: http
   clusterIP: None
   selector:
@@ -223,7 +223,7 @@ spec:
     release: my-hdfs-namenode
 ---
 # Source: hdfs/charts/hdfs-namenode-k8s/templates/namenode-statefulset.yaml
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: my-hdfs-namenode
@@ -234,6 +234,10 @@ metadata:
 spec:
   serviceName: my-hdfs-namenode
   replicas: 2
+  selector:
+    matchLabels:
+      app: hdfs-namenode
+      release: my-hdfs-namenode
   template:
     metadata:
       labels:
@@ -264,9 +268,9 @@ spec:
           args:
             - /entrypoint.sh "/nn-scripts/format-and-run.sh"
           ports:
-          - containerPort: 8020
+          - containerPort: 8022
             name: fs
-          - containerPort: 50070
+          - containerPort: 50077
             name: http
           volumeMounts:
             - name: nn-scripts
@@ -301,7 +305,7 @@ spec:
             storage: "100Gi"
 ---
 # Source: hdfs/charts/hdfs-namenode-k8s/templates/namenode-statefulset.yaml
-apiVersion: policy/v1beta1
+apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   name: my-hdfs-namenode

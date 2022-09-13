@@ -167,7 +167,7 @@ data:
     <configuration>
       <property>
         <name>fs.defaultFS</name>
-        <value>hdfs://my-hdfs-namenode-0.my-hdfs-namenode.default.svc.cluster.local:8020</value>
+        <value>hdfs://my-hdfs-namenode-0.my-hdfs-namenode.default.svc.cluster.local:8022</value>
       </property>
     </configuration>
   hdfs-site.xml: |
@@ -235,7 +235,7 @@ metadata:
     release: my-hdfs
 spec:
   ports:
-  - port: 8020
+  - port: 8022
     name: fs
   clusterIP: None
   selector:
@@ -245,7 +245,7 @@ spec:
 # Source: hdfs/charts/hdfs-datanode-k8s/templates/datanode-daemonset.yaml
 # Deleting a daemonset may need some trick. See
 # https://github.com/kubernetes/kubernetes/issues/33245#issuecomment-261250489
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: my-hdfs-datanode
@@ -254,6 +254,10 @@ metadata:
     chart: hdfs-datanode-k8s-0.1.0
     release: my-hdfs
 spec:
+  selector:
+    matchLabels:
+        app: hdfs-datanode
+        release: my-hdfs
   template:
     metadata:
       labels:
@@ -316,7 +320,6 @@ spec:
 ---
 # Source: hdfs/charts/hdfs-client-k8s/templates/client-deployment.yaml
 apiVersion: apps/v1
-apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: my-hdfs-client
@@ -358,7 +361,7 @@ spec:
             name: my-hdfs-config
 ---
 # Source: hdfs/charts/hdfs-simple-namenode-k8s/templates/namenode-statefulset.yaml
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: my-hdfs-namenode
@@ -370,6 +373,10 @@ spec:
   serviceName: my-hdfs-namenode
   # Create a size-1 set.
   replicas: 1
+  selector:
+    matchLabels:
+      app: hdfs-namenode
+      release: my-hdfs
   template:
     metadata:
       labels:
@@ -390,7 +397,7 @@ spec:
             - name: CLUSTER_NAME
               value: hdfs-k8s
           ports:
-          - containerPort: 8020
+          - containerPort: 8022
             name: fs
           volumeMounts:
             - name: hdfs-name

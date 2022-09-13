@@ -160,19 +160,19 @@ data:
       </property>
       <property>
         <name>dfs.namenode.rpc-address.hdfs-k8s.nn0</name>
-        <value>my-hdfs-namenode-0.my-hdfs-namenode.default.svc.cluster.local:8020</value>
+        <value>my-hdfs-namenode-0.my-hdfs-namenode.default.svc.cluster.local:8022</value>
       </property>
       <property>
         <name>dfs.namenode.rpc-address.hdfs-k8s.nn1</name>
-        <value>my-hdfs-namenode-1.my-hdfs-namenode.default.svc.cluster.local:8020</value>
+        <value>my-hdfs-namenode-1.my-hdfs-namenode.default.svc.cluster.local:8022</value>
       </property>
       <property>
         <name>dfs.namenode.http-address.hdfs-k8s.nn0</name>
-        <value>my-hdfs-namenode-0.my-hdfs-namenode.default.svc.cluster.local:50070</value>
+        <value>my-hdfs-namenode-0.my-hdfs-namenode.default.svc.cluster.local:50077</value>
       </property>
       <property>
         <name>dfs.namenode.http-address.hdfs-k8s.nn1</name>
-        <value>my-hdfs-namenode-1.my-hdfs-namenode.default.svc.cluster.local:50070</value>
+        <value>my-hdfs-namenode-1.my-hdfs-namenode.default.svc.cluster.local:50077</value>
       </property>
       <property>
         <name>dfs.namenode.shared.edits.dir</name>

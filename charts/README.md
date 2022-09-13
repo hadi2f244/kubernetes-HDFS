@@ -205,11 +205,11 @@ the list of these host names like:
 
   $ _HOSTS+=$(kubectl describe configmap my-hdfs-config |  \
       grep -A 1 -e dfs.namenode.rpc-address.hdfs-k8s  \
-          -e dfs.namenode.shared.edits.dir |  
+          -e dfs.namenode.shared.edits.dir |
       grep "<value>" |
       sed -e "s/<value>//"  \
           -e "s/<\/value>//"  \
-          -e "s/:8020//"  \
+          -e "s/:8022//"  \
           -e "s/qjournal:\/\///"  \
           -e "s/:8485;/ /g"  \
           -e "s/:8485\/hdfs-k8s//")

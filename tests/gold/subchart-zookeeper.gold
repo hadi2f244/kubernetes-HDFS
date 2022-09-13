@@ -305,15 +305,15 @@ spec:
   ports:
     - name: client
       port: 2181
-      targetPort: 
+      targetPort:
       protocol: TCP
     - name: election
       port: 3888
-      targetPort: 
+      targetPort:
       protocol: TCP
     - name: server
       port: 2888
-      targetPort: 
+      targetPort:
       protocol: TCP
   selector:
     app: zookeeper
@@ -337,13 +337,13 @@ spec:
       port: 2181
       protocol: TCP
       targetPort: client
-      
+
   selector:
     app: zookeeper
     release: my-hdfs-zookeeper
 ---
 # Source: hdfs/charts/zookeeper/templates/statefulset.yaml
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: my-hdfs-zookeeper
@@ -362,9 +362,14 @@ spec:
       app: zookeeper
       release: my-hdfs-zookeeper
       component: server
+  selector:
+    matchLabels:
+      app: zookeeper
+      release: my-hdfs-zookeeper
+      component: server
   updateStrategy:
     type: OnDelete
-    
+
   template:
     metadata:
       labels:
@@ -376,7 +381,7 @@ spec:
       securityContext:
         fsGroup: 1000
         runAsUser: 1000
-        
+
       containers:
 
         - name: zookeeper
@@ -390,27 +395,27 @@ spec:
             - name: client
               containerPort: 2181
               protocol: TCP
-              
+
             - name: election
               containerPort: 3888
               protocol: TCP
-              
+
             - name: server
               containerPort: 2888
               protocol: TCP
-              
+
           livenessProbe:
             exec:
               command:
               - zkOk.sh
             initialDelaySeconds: 20
-            
+
           readinessProbe:
             exec:
               command:
               - zkOk.sh
             initialDelaySeconds: 20
-            
+
           env:
             - name: ZK_REPLICAS
               value: "1"
@@ -451,7 +456,7 @@ spec:
           resources:
             requests:
               memory: 100m
-            
+
           volumeMounts:
             - name: data
               mountPath: /var/lib/zookeeper
@@ -467,7 +472,7 @@ spec:
             storage: "5Gi"
 ---
 # Source: hdfs/charts/zookeeper/templates/poddisruptionbudget.yaml
-apiVersion: policy/v1beta1
+apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   name: my-hdfs-zookeeper

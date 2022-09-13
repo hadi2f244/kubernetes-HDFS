@@ -149,7 +149,7 @@ spec:
     release: my-hdfs-journalnode
 ---
 # Source: hdfs/charts/hdfs-journalnode-k8s/templates/journalnode-statefulset.yaml
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: my-hdfs-journalnode
@@ -160,6 +160,10 @@ metadata:
 spec:
   serviceName: my-hdfs-journalnode
   replicas: 3
+  selector:
+    matchLabels:
+      app: hdfs-journalnode
+      release: my-hdfs-journalnode
   template:
     metadata:
       labels:
@@ -208,7 +212,7 @@ spec:
             storage: "20Gi"
 ---
 # Source: hdfs/charts/hdfs-journalnode-k8s/templates/journalnode-statefulset.yaml
-apiVersion: policy/v1beta1
+apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   name: my-hdfs-journalnode
